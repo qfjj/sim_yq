@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>简理舆情检测平台</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" type="text/css">
+	</head>
+	<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top" style="background-color: #000000;height: 60px;">
+      <div class="container-fluid">
+        <div class="navbar-header">
+        	<a href="{{ url_for('home.index') }}">
+				<img src="{{ url_for('static', filename='img/biaoyu-2.png') }}" style="width:140px;margin-top: 20px;margin-left: 5px;"  >
+			</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse" >
+          <ul class="nav navbar-nav navbar-right">
+          	<li><a href="#">
+                <span style="font-size: 15px;color: #FFFFFF;">
+                    {{ username }}
+                </span>
+            </a></li>
+            <li><a href="{{ url_for('home.logout') }}">
+                <span style="font-size: 15px;color: #FFFFFF;">
+                    注销
+                </span>
+            </a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li><a href="{{ url_for('home.user') }}">信息列表</a></li>
+            <li><a href="{{ url_for('home.charts') }}">图表分析</a></li>
+            <li><a href="{{ url_for('home.bigdata') }}" target="_blank">数据大屏</a></li>
+            <li class="active"><a href="#">设置 <span class="sr-only">(current)</span></a></li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <div class="row clearfix">
+          		<div class="col-md-12">
+                    {% for msg in get_flashed_messages(category_filter=["ok"]) %}
+                    <div class="alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <i class="icon fa fa-check"></i> {{ msg }}
+                    </div>
+                    {% endfor %}
+                    <br/>
+          			<div class="panel">
+                        <form method="post">
+          				<div class="panel-heading-padd">
+          					<div class="panel-heading">
+          						<h3 class="panel-title">修改方案</h3>
+          					</div>
+          				</div>
+          				<div class="panel-collapse collapse in">
+          					<div class="panel-body">
+          						<div class="control-group">
+          							<label class="control-label">
+          								<font class="tagRed">*</font>
+          								方案名：
+          							</label>
+          							<div class="controls">
+          								{{ setting.taskname }}
+                                        {% for err in setting.taskname.errors %}
+                                        <div class="col-md-12" style="color: red">{{ err }}</div>
+                                            <br/>
+                                        {% endfor %}
+          							</div>
+          						</div>
+          						<div class="control-group">
+          							<label class="control-label">
+          								<font class="tagRed">*</font>
+          								1、请输入监测关键词：
+          							</label>
+          							<div class="controls">
+          								{{ setting.keyname }}
+                                        {% for err in setting.keyname.errors %}
+                                        <div class="col-md-12" style="color: red">{{ err }}</div>
+                                            <br/>
+                                        {% endfor %}
+          							</div>
+          						</div>
+          					</div>
+          				</div>
+                        {{ setting.csrf_token }}
+          				<div class="panel-footer default border-n align_c">
+                            {{ setting.submit }}
+                        </div>
+          			    </form>
+                    </div>
+          		</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+    <script src="../../assets/js/vendor/holder.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+	</body>
+</html>

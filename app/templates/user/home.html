@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>简理舆情检测平台</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" type="text/css">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="../../assets/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	</head>
+	<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top" style="background-color: #000000;height: 60px;">
+      <div class="container-fluid">
+        <div class="navbar-header">
+        	<a href="{{ url_for('home.index') }}">
+				<img src="{{ url_for('static', filename='img/biaoyu-2.png') }}" style="width:140px;margin-top: 20px;margin-left: 5px;"  >
+			</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse" >
+          <ul class="nav navbar-nav navbar-right">
+          	<li><a href="#">
+                <span style="font-size: 15px;color: #FFFFFF;">
+                    {{ username }}
+                </span>
+            </a></li>
+            <li><a href="{{ url_for('home.logout') }}">
+                <span style="font-size: 15px;color: #FFFFFF;">
+                    注销
+                </span>
+            </a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="#">信息列表 <span class="sr-only">(current)</span></a></li>
+            <li><a href="{{ url_for('home.charts') }}">图表分析</a></li>
+            <li><a href="{{ url_for('home.bigdata') }}" target="_blank">数据大屏</a></li>
+            <li><a href="{{ url_for('home.setting') }}">设置</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <div class="row clearfix">
+          	<div class="col-md-12">
+          		<div class="panel">
+          			<div class="panel-body clearfix">
+          				<h1 class="fz20" style="margin-top: 0px;margin-bottom: 0px;">
+                            {{ taskname }}
+                        </h1>
+          			</div>
+          		</div>
+          	</div>
+          </div>
+            <div class="min-height600">
+              <div class="row clearfix">
+                  <div class="col-md-12">
+                      <div class="panel">
+                          <div class="panel-body clearfix" style="padding: 0 10px;">
+                              <div class="xx_set rel clearfix">
+                                <ul >
+                                  <li >
+                                      <div class="row clearfix">
+                                          <div class="col-md-6">
+                                            <span class="x1">监测时间:</span>
+                                            <span class="x2">
+                                                <a href="{{ url_for('home.user') }}?time=1&order={{ p['order'] }}&type={{ p['type'] }}">今天</a>
+                                                <a href="{{ url_for('home.user') }}?time=2&order={{ p['order'] }}&type={{ p['type'] }}">2天</a>
+                                                <a href="{{ url_for('home.user') }}?time=3&order={{ p['order'] }}&type={{ p['type'] }}">3天</a>
+                                                <a href="{{ url_for('home.user') }}?time=7&order={{ p['order'] }}&type={{ p['type'] }}">7天</a>
+                                                <a href="{{ url_for('home.user') }}?time=10&order={{ p['order'] }}&type={{ p['type'] }}">10天</a>
+                                                <a href="{{ url_for('home.user') }}?time=30&order={{ p['order'] }}&type={{ p['type'] }}">30天</a>
+                                            </span>
+                                          </div>
+                                          <div class="col-md-6">
+                                            <span class="x1">信息排序:</span>
+                                            <span class="x22">
+                                                <a href="{{ url_for('home.user') }}?time={{ p['time'] }}&order=desc&type={{ p['type'] }}">时间降序</a>
+                                                <a href="{{ url_for('home.user') }}?time={{ p['time'] }}&order=asc&type={{ p['type'] }}">时间升序</a>
+                                            </span>
+                                          </div>
+                                      </div>
+                                  </li><li >
+                                      <div class="row clearfix">
+                                          <div class="col-md-6">
+                                            <span class="x1">信息属性:</span>
+                                            <span class="x2">
+                                                <a href="{{ url_for('home.user') }}?time={{ p['time'] }}&order={{ p['order'] }}&type=all">全部</a>
+                                                <a href="{{ url_for('home.user') }}?time={{ p['time'] }}&order={{ p['order'] }}&type=mg">敏感</a>
+                                                <a href="{{ url_for('home.user') }}?time={{ p['time'] }}&order={{ p['order'] }}&type=nomg">非敏感</a>
+                                            </span>
+                                          </div>
+                                      </div>
+                                  </li>
+                                </ul>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="row clearfix">
+                  <div class="col-md-12">
+                      <div class="panel">
+                          <div class="panel-body" style="padding: 0 10px">
+                            <div class="row clearfix" style="margin-bottom: -5px;">
+                                <div class="col-md-12">
+                                    <div class="xx_set clearfix">
+                                      <ul>
+                                        <li>
+                                          <div class="row clearfix">
+                                            <div class="col-md-8"></div>
+                                            <div class="col-md-4">
+                                              <div class="searchBox2">
+
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </li>
+                                      </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="">
+                              <div class="row clearfix">
+                                <div class="col-md-12">
+                                  <div class="xx_list">
+                                    <div class="list_tab"></div>
+                                    <div class="list_tab_btn"></div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="row clearfix" style="margin-right: -11px;margin-left: -11px;">
+                                <div class="xx_table float_l">
+                                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <thead>
+                                      <tr>
+                                        <th class="rel" width>内容</th>
+                                        <th width="15%">采集自</th>
+                                        <th width="10%">时间</th>
+                                      </tr>
+                                    </thead>
+                                        <tbody>
+                                          {% for news in news %}
+                                          <tr>
+                                            <td>
+                                                <div class="zhaiyao">
+                                                    {% if news.source == '微博' %}
+                                                        <img src="{{ url_for('static', filename='img/wb.png') }} " class="tx">
+                                                    {% elif news.source == '贴吧' %}
+                                                        <img src="{{ url_for('static', filename='img/tb.png') }}" class="tx">
+                                                    {% elif news.source == '微信' %}
+                                                        <img src="{{ url_for('static', filename='img/wx.png') }}" class="tx">
+                                                    {% elif news.source == '搜狐新闻' %}
+                                                        <img src="{{ url_for('static', filename='img/sh.png') }}" class="tx">
+                                                    {% endif %}
+                                                    <div class="tit" style="color: #000;">
+                                                        {{ news.screen_name }}
+                                                    </div>
+                                                    <div class="summaryDiv">
+                                                        <a href="{{ url_for('home.content') }}?post_id={{ news.id }}" target="_blank" class="a_hover">{{ news.content|striptags|truncate }}</a>
+
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {{ news.source }}
+                                            </td>
+                                            <td>
+                                                {{ news.created_at }}
+                                            </td>
+                                           </tr>
+                                          {% endfor %}
+                                        </tbody>
+                                  </table>
+                                  <table>
+                                    <tbody>
+                                      <tr bgcolor="#ffffff">
+                                        <td colspan="15" style="font-size:12px;height: 60px;">
+                                          <div style="float:right;padding-right:0px;width:auto;">
+                                            {{ pagination.links }}
+                                          </div>
+	                                    </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+    <script src="../../assets/js/vendor/holder.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+	</body>
+</html>

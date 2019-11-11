@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>简理舆情监测平台</title>
+		<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+		<!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+		<!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+		<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	</head>
+	<body>
+		<div style="background-color:#000">
+    		<div class="container" style="width:99%;">
+        		<div class="row">
+          			<div class="col-md-6" style="padding:3px;height: 60px;">
+						<a href="">
+							<img src="{{ url_for('static', filename='img/logo-1-1.png') }}" style="width:135px;height:50px;margin-top: 4px;margin-left: 1px;"  >
+						</a>
+          			</div>
+          			<div class="col-md-6" style="text-align:right;top:20px">
+                        {% if data.user_info %}
+                            <a href="{{ url_for('home.user') }}" style="text-decoration:none; font-size: 15px;color: #FFFFFF;">{{ data.user_info }}</a>
+                        {% else %}
+                            <a href="{{ url_for('home.login') }}" style="text-decoration:none; font-size: 15px;color: #FFFFFF;">登录</a>
+                        {% endif %}
+          			</div>
+       			</div>
+    		</div>
+		</div>
+		
+		<div class="swiper"></div>
+		<div>
+    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+      <!-- Indicators -->
+      <ol class="carousel-indicators">
+        <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+        <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+      </ol>
+    
+      <!-- Wrapper for slides -->
+      <div class="carousel-inner" role="listbox">
+        <div class="item active">
+          <img src="{{ url_for('static', filename='img/1.png') }}" style="width: 100%;height:947px;background-size:100%;" >
+          <div class="carousel-caption">
+          </div>
+        </div>
+        <div class="item">
+          <img src="{{ url_for('static', filename='img/2.png') }}" style="width: 100%;height:947px;background-size:100%;" >
+          <div class="carousel-caption">
+          </div>
+        </div>
+		</div>
+  		</div>
+    </body>
+</html>
+ 

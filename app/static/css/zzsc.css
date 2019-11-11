@@ -1,0 +1,31 @@
+@charset "utf-8";
+*{ margin:0; padding:0; list-style:none;}
+img{ border:0;}
+body{ font-size:12px; background:#FFFFFF; line-height:180%;}
+
+.zzsc {	width: 100%;height: 590px;position:relative;overflow:hidden; }
+.downpaly {	position:absolute;width:95%;display:inline;padding:10px 10px;left:0;top:0;margin-left: 10px}
+.fl {float:left}
+.downpaly img {	display:block;	max-width:150px;}
+.downpaly li {padding:8px 0px;overflow:hidden;margin: 8px}
+.hr-line-div{
+    width:110%;
+    height:1px;
+    margin: 5px;
+    background: -webkit-linear-gradient(left, rgba(5,32,53,0.4) -4%,#6495ED 50%,rgba(5,32,53,0.4) 100%);
+
+  }
+.trapezoid {
+    position: relative;
+    width: 300px;
+    border-top: 60px solid #01acf2;
+    border-left: 40px solid transparent;
+    border-right: 40px solid transparent;
+}
+
+#grad1 {
+    height: 200px;
+    background-color: red; /* 不支持线性的时候显示 */
+    background-image: linear-gradient(to right, #1E90FF , 	#00F5FF);
+}
+

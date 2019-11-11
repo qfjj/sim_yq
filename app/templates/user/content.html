@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+    <title>简理舆情检测平台</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/comm.css') }}" type="text/css">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="../../assets/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top" style="background-color: #000000;height: 60px;">
+      <div class="container-fluid">
+        <div class="navbar-header">
+        	<a href="{{ url_for('home.index') }}">
+				<img src="{{ url_for('static', filename='img/biaoyu-2.png') }}" style="width:140px;margin-top: 20px;margin-left: 5px;"  >
+			</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse" >
+          <ul class="nav navbar-nav navbar-right">
+          	<li><a href="#">
+                <span style="font-size: 15px;color: #FFFFFF;">
+                    {{ username }}
+                </span>
+            </a></li>
+            <li><a href="{{ url_for('home.logout') }}">
+                <span style="font-size: 15px;color: #FFFFFF;">
+                    注销
+                </span>
+            </a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="page-layout clearfix">
+        <div class="page-layout-content clearfix rel">
+            <div class="cont_view_r rel boxShadow" style="max-width: 1100px;width: 100%;margin-top: 60px">
+                <div class="cont_viewBox">
+                    <div class="tit tit2">
+                        <div class="float_l">
+                            信息详情
+                        </div>
+                    </div>
+                    <div class="cont_tit rel">
+                        <h2>{{ cont.content|truncate(length=20,end='') }}</h2>
+                    </div>
+                    <div>
+                        <table border="0" cellspacing="0" cellpadding="0" class="inforTable">
+                            <tbody>
+                                <tr>
+                                    <td width="15%">来源:</td>
+                                    <td width="35%">{{ cont.source }}</td>
+                                    <td width="15%" >涉及关键词:</td>
+                                    <td style="color: #fe0000">{{ keyname }}</td>
+                                </tr>
+                                <tr>
+                                    <td width="15%">属性:</td>
+                                    <td width="35%" style="color: #fe0000">
+                                        {% if cont.mg == '敏感' %}
+                                            敏感
+                                        {% else %}
+                                            非敏感
+                                        {% endif %}
+                                    </td>
+                                    <td width="15%">发布时间:</td>
+                                    <td>{{ cont.created_at }}</td>
+                                </tr>
+                                <tr>
+								    <td>原文链接:</td>
+								    <td colspan="3">
+                                        <a href="{{ cont.html }}" target="_blank">{{ cont.html }}</a>
+                                    </td>
+							    </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="contentBox">
+                        <div class="bt">正文</div>
+                        <div class="pading20" id="content">
+                            {{ cont.content}}
+                        </div>
+                        <script type="text/javascript">
+                            var content = document.getElementById('content');
+                            content.innerHTML = content.innerHTML.replace(/({{ keyname }})/g, "<span style=\"color:#fe0000\">$1</span>");
+                        </script>
+                    </div>
+                    <div class="promptNumber" style="width: 100%;">
+                        页面内容来源于网络，请以原网站为准。对传播此页面内容导致的后果，简理舆情概不承担责任。
+					</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

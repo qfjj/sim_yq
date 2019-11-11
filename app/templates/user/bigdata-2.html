@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+	<script src='http://cdn.files.51wyq.cn/web/js/jquery-1.10.2.min.js?v=201909211230'></script>
+    <script src="http://cdn.files.51wyq.cn/web/css/indexV4/global/vendor/jquery-countdown/jquery.countdown.min.js?v=201909211230" ></script>
+    <title>简理舆情检测平台</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/zzsc.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
+    <script src="{{ url_for('static', filename = 'js/echarts.js') }}"></script>
+    <script src="{{ url_for('static', filename = 'js/china.js') }}"></script>
+</head>
+<body style="background-color:#000000;">
+    <div class="col-md-12">
+        <div class="row clearfix">
+            <div class="col-md-3 col-md-3a" >
+              <div class="panel" style="margin-top: 10px;margin-bottom: 10px;background-color:rgba(5,32,53,0.8);border-color:rgba(25,25,112,1)">
+                <div style="padding: 10px;width: 50%;margin:0 auto;text-align: center;">
+                  <span style="color: #ffffff;font-size: 15px;text-align: center;">
+                      热点信息
+                  </span>
+                  <div class="hr-line-div" style="width: 50%;margin:0 auto"></div>
+                </div>
+                <div class="zzsc">
+                  <ul id="downpaly" class="downpaly">
+                    {% for news in news %}
+                      <li style="color: #ffffff;">
+                        {{ news.content|striptags|truncate }}
+                        <div style="margin: -2px"></div>
+                        <br />
+                        <span style="color: #888888">
+                           {{ news.created_at }}&nbsp&nbsp{{ news.source }}
+                        </span>
+                        <div class="hr-line-div"></div>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+              <div class="panel" style="margin-top: 10px;margin-bottom: 10px;background-color:rgba(5,32,53,0.8);border-color:rgba(25,25,112,1)">
+                  <div style="padding: 10px;width: 91%;margin:0 auto;text-align: center;position: absolute; z-index: 2;">
+                  <span style="color: #ffffff;font-size: 15px;text-align: center;">
+                      媒体活跃度
+                  </span>
+                  <div class="hr-line-div" style=" width: 30%;margin:0 auto"></div>
+                </div>
+                  <div id="echart-bie-mt" style="width: 100%;height: 330px;">
+                    <script type="text/javascript">
+                        function dayComment(url, chartId) {
+                                $.ajax({//Ajax请求你要展现的数据
+                                    url : url,
+                                    type : 'post',
+                                    cache : false,
+                                    dataType : 'json',
+                                    async:false,	//改为同步
+                                    data : {  },	//查看方式
+                                    success : function(data) {
+                                        manyLineChart(chartId, data.legendData, data.datas);
+                                    },
+                                    error : function() {
+                                        alert('服务器异常！')
+                                    }
+                                });
+                            }
+                            function manyLineChart(chartId, legendData, datas){
+                                var lineCount = legendData.length;
+                                var data = [];
+                                for(var x=0; x<lineCount; x++){
+                                    data[x] = {name:legendData[x], value:datas[x]};
+                                }
+                                var myChart = echarts.init(document.getElementById( chartId ));
+                                arrName = getArrayValue(data, "name");
+                                arrValue = getArrayValue(data, "value");
+                                sumValue = eval(arrValue.join('+'));
+                                objData = array2obj(data, "name");
+                                optionData = getData(data);
+                                function getArrayValue(array, key) {
+                                    var key = key || "value";
+                                    var res = [];
+                                    if (array) {
+                                        array.forEach(function(t) {
+                                            res.push(t[key]);
+                                        });
+                                    }
+                                    return res;
+                                }
+
+                                function array2obj(array,key) {
+                                    var resObj = {};
+                                    for(var i=0;i<array.length;i++){
+                                        resObj[array[i][key]] = array[i];
+                                    }
+                                    return resObj;
+                                }
+
+                                function getData(data) {
+                                    var res = {
+                                        series: [],
+                                        yAxis: []
+                                    };
+                                    for (let i = 0; i < data.length; i++) {
+                                        res.series.push({
+                                            name: '数据来源',
+                                            type: 'pie',
+                                            clockWise: false, //顺时加载
+                                            hoverAnimation: false, //鼠标移入变大
+                                            radius: [65 - i * 15 + '%', 57 - i * 15 + '%'],
+                                            center: ["60%", "55%"],
+                                            label: {
+                                                show: false
+                                            },
+                                            itemStyle: {
+                                                label: {
+                                                    show: false,
+                                                },
+                                                labelLine: {
+                                                    show: false
+                                                },
+                                                borderWidth: 5,
+                                            },
+                                            data: [{
+                                                value: data[i].value,
+                                                name: data[i].name
+                                            }, {
+                                                value: sumValue - data[i].value,
+                                                name: '',
+                                                itemStyle: {
+                                                    color: "rgba(0,0,0,0)",
+                                                    borderWidth: 0
+                                                },
+                                                tooltip: {
+                                                    show: false
+                                                },
+                                                hoverAnimation: false
+                                            }]
+                                        });
+                                        res.series.push({
+                                            name: '',
+                                            type: 'pie',
+                                            silent: true,
+                                            z: 1,
+                                            clockWise: false, //顺时加载
+                                            hoverAnimation: false, //鼠标移入变大
+                                            radius: [65 - i * 15 + '%', 57 - i * 15 + '%'],
+                                            center: ["60%", "55%"],
+                                            label: {
+                                                show: false
+                                            },
+                                            itemStyle: {
+                                                label: {
+                                                    show: false,
+                                                },
+                                                labelLine: {
+                                                    show: false
+                                                },
+                                                borderWidth: 5,
+                                            },
+                                            data: [{
+                                                value: 100,
+                                                itemStyle: {
+                                                    color: "rgb(128,128,128,0.4)",
+                                                    borderWidth: 0
+                                                },
+                                                tooltip: {
+                                                    show: false
+                                                },
+                                                hoverAnimation: false
+                                            },]
+                                        });
+                                    }
+                                    return res;
+                                }
+                                var option = {
+                                        legend: {
+                                            show: true,
+                                            top: '20%',
+                                            left: '5%',
+                                            itemWidth: 10,
+                                            itemHeight: 10,
+                                            textStyle:{
+                                            color:'#fff',
+                                        }
+                                        },
+                                        tooltip: {
+                                            show: true,
+                                            trigger: "item",
+                                            formatter: "{a}<br>{b}:{c}({d}%)"
+                                        },
+                                        color: ['#FF8700', '#ffc300', '#00e473', '#009DFF'],
+                                        yAxis: [{
+                                            type: 'category',
+                                            inverse: true,
+                                            axisLine: {
+                                                show: false
+                                            },
+                                            axisTick: {
+                                                show: false
+                                            },
+                                            axisLabel: {
+                                                interval: 0,
+                                                inside: true,
+                                                textStyle: {
+                                                    color: "#000",
+                                                    fontSize: 10,
+                                                },
+                                                show: true
+                                            },
+                                            data: optionData.yAxis
+                                        }],
+                                        xAxis: [{
+                                            show: false
+                                        }],
+                                        series: optionData.series
+                                    };
+
+                                // 使用刚指定的配置项和数据显示图表。
+                                myChart.setOption( option );
+                            };
+
+                            dayComment('/chart/bie/in', 'echart-bie-mt');	//执行
+                    </script>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-md-6a">
+              <div style="margin-right: -20px;margin-left: -20px;background-color:rgba(5,32,53,0.8);background:url({{ url_for('static', filename='img/bj2.png') }});background-size: cover">
+              <div class="panel" style="margin-top: 10px;margin-bottom: 10px;height: 330px;background-color:rgba(5,32,53,0.8);border-color:rgba(25,25,112,1);">
+                <div style="padding: 14px;width: 95%;position: absolute; z-index: 2;">
+                    <span id="dateTime" style="color: #428BCA;font-size: 7px;font-weight: 600"></span>
+                  </div>
+                <div class="col-md-2">
+                  <div id="echart-pbar-nomg" style="bottom: -50px;width: 100%;height: 250px">
+                    <script type="text/javascript">
+                        function dayComment(url, chartId) {
+                                $.ajax({//Ajax请求你要展现的数据
+                                    url : url,
+                                    type : 'post',
+                                    cache : false,
+                                    dataType : 'json',
+                                    async:false,	//改为同步
+                                    data : {  },	//查看方式
+                                    success : function(data) {
+                                        manyLineChart(chartId, data.num, data.nummg);
+                                    },
+                                    error : function() {
+                                        alert('服务器异常！')
+                                    }
+                                });
+                            }
+                            function manyLineChart(chartId, num, nummg){
+                                var myChart = echarts.init(document.getElementById( chartId ));
+                                var colorList = ['#1E90FF'];
+                                var option = {
+                                        color: colorList,
+                                        tooltip: {
+                                            trigger: 'axis',
+                                            axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                                                type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                                            }
+                                        },
+                                        grid: [{
+                                           bottom: 0,
+                                       }],
+                                        xAxis: [{
+                                            show:false,
+                                            data: ['非敏感数据'],
+                                        }],
+                                        yAxis: {
+                                            show:false
+                                        },
+                                        series: [{
+                                                tooltip: {
+                                                    show: false
+                                                },
+                                                name: 'bg',
+                                                type: 'pictorialBar',
+                                                barWidth: '80%',
+                                                silent: true,
+                                                symbol: 'rect',
+                                                symbolRepeat: true,
+                                                symbolMargin: 1,
+                                                symbolSize: [50, 4],
+                                                itemStyle: {
+                                                    color: '#0B4B57'
+                                                },
+                                                data: [num]
+                                            },
+                                            {
+                                                type: 'pictorialBar',
+                                                animation: true,
+                                                animationDuration: 600,
+                                                symbol: 'rect',
+                                                symbolRepeat: true,
+                                                symbolSize: [50, 4],
+                                                symbolMargin: 1,
+                                                barWidth: '80%',
+                                                itemStyle: {
+                                                    normal: {
+                                                        color: function(params) {
+                                                            return colorList[params.dataIndex]
+                                                        },
+                                                        label: {
+                                                            show: false
+                                                        }
+                                                    }
+                                                },
+                                                data: [num - nummg]
+                                            }
+                                        ]
+                                    };
+
+                                // 使用刚指定的配置项和数据显示图表。
+                                myChart.setOption( option );
+                            };
+
+                            dayComment('/chart/countmg/', 'echart-pbar-nomg');	//执行
+                    </script>
+                  </div>
+                </div>
+                <div class="col-md-8" >
+                  <div style="padding: 20px;width: 90%;margin:0 auto;text-align: center;background:url({{ url_for('static', filename='img/logokuan.png') }});background-size: cover">
+                    <span style="color: #ffffff;font-weight: 600;font-size: 20px;text-align: center;">
+                      {{ taskname }}
+                    </span>
+                  </div>
+                  <div style="padding-top: 130px;width: 100%;height: 100px;margin:0 auto;text-align: center;">
+                      <div class="radar"></div>
+{#                    <span style="color: #ffffff;font-weight: 600;font-size: 20px;text-align: center;">#}
+{#                      {{ taskname }}#}
+{#                    </span>#}
+                  </div>
+                  <div style="padding: 35px 40px 0 40px;width: 100%;height: 45px;">
+                    <span style="font-weight: 600;font-size: 16px;color: #1E90FF;float: left">
+                      实时数据
+                    </span>
+                    <span style="font-weight: 600;font-size: 14px;color: #F08080;float: right">
+                      敏感数据
+                    </span>
+                  </div>
+                  <div style="padding: 30px 40px 0 40px;width: 100%;height: 50px;">
+                    <div id="count" style="float: left;width: 86%">
+                      <script type="text/javascript">
+                        $(document).ready(function() {
+                    $.ajax({
+                        url : "/chart/countmg/",
+                        dataType : "json",//数据格式
+                        type : "post",//请求方式
+                        async : false,//是否异步请求
+                        success : function(data) {   //如果请求成功，返回数据。
+                                            var num = ''
+                                            for(x = 0; x < data.num_2.length ; x ++ ){
+                                                num += "<span style=\"color: #1E90FF;background: #000;font-size: 26px;\">"
+                                                    + "&nbsp;" + data.num_2[x] + "&nbsp;" + "</span>" + "&nbsp;&nbsp;"
+                                            }
+                                $("#count").html(num); //在html页面id=test的标签里显示html内容
+                        },
+                    })
+                    })
+                    </script>
+                    </div>
+                    <div id="countmg" style="float: right;width: 14%">
+                      <script type="text/javascript">
+                        $(document).ready(function() {
+                    $.ajax({
+                        url : "/chart/countmg/",
+                        dataType : "json",//数据格式
+                        type : "post",//请求方式
+                        async : false,//是否异步请求
+                        success : function(data) {   //如果请求成功，返回数据。
+                                            var num = ''
+                                            for(x = 0; x < data.nummg_2.length ; x ++ ){
+                                                num += "<span style=\"color: #F08080;background: #000;font-size: 26px;\">"
+                                                    + "&nbsp;" + data.nummg_2[x] + "&nbsp;" + "</span>" + "&nbsp;&nbsp;"
+                                            }
+                                $("#countmg").html(num); //在html页面id=test的标签里显示html内容
+                        },
+                    })
+                    })
+                    </script>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div id="echart-pbar-mg" style="bottom: -50px;width: 100%;height: 250px;">
+                    <script type="text/javascript">
+                        function dayComment(url, chartId) {
+                                $.ajax({//Ajax请求你要展现的数据
+                                    url : url,
+                                    type : 'post',
+                                    cache : false,
+                                    dataType : 'json',
+                                    async:false,	//改为同步
+                                    data : {  },	//查看方式
+                                    success : function(data) {
+                                        manyLineChart(chartId, data.num, data.nummg);
+                                    },
+                                    error : function() {
+                                        alert('服务器异常！')
+                                    }
+                                });
+                            }
+                            function manyLineChart(chartId, num, nummg){
+                                var myChart = echarts.init(document.getElementById( chartId ));
+                                var colorList = ['#F08080'];
+                                var option = {
+                                        color: colorList,
+                                        tooltip: {
+                                            trigger: 'axis',
+                                            axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                                                type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                                            }
+                                        },
+                                        grid: [{
+                                           bottom: 0,
+                                       }],
+                                        xAxis: [{
+                                            show:false,
+                                            data: ['敏感数据'],
+                                        }],
+                                        yAxis: {
+                                            show:false
+                                        },
+                                        series: [{
+                                                tooltip: {
+                                                    show: false
+                                                },
+                                                name: 'bg',
+                                                type: 'pictorialBar',
+                                                barWidth: '80%',
+                                                silent: true,
+                                                symbol: 'rect',
+                                                symbolRepeat: true,
+                                                symbolMargin: 1,
+                                                symbolSize: [50, 4],
+                                                itemStyle: {
+                                                    color: '#0B4B57'
+                                                },
+                                                data: [num]
+                                            },
+                                            {
+                                                type: 'pictorialBar',
+                                                animation: true,
+                                                animationDuration: 600,
+                                                symbol: 'rect',
+                                                symbolRepeat: true,
+                                                symbolSize: [50, 4],
+                                                symbolMargin: 1,
+                                                barWidth: '80%',
+                                                itemStyle: {
+                                                    normal: {
+                                                        color: function(params) {
+                                                            return colorList[params.dataIndex]
+                                                        },
+                                                        label: {
+                                                            show: false
+                                                        }
+                                                    }
+                                                },
+                                                data: [nummg]
+                                            }
+                                        ]
+                                    };
+
+                                // 使用刚指定的配置项和数据显示图表。
+                                myChart.setOption( option );
+                            };
+
+                            dayComment('/chart/countmg/', 'echart-pbar-mg');	//执行
+                    </script>
+                  </div>
+                </div>
+              </div>
+              </div>
+              <div style="margin-right: -20px;margin-left: -20px;background-color:rgba(5,32,53,0.8);">
+              <div class="panel" style="margin-top: 10px;margin-bottom: 10px;background-color:rgba(5,32,53,0.8);border-color:rgba(25,25,112,1)">
+                  <div id="echart-cn" style="width: 100%;height: 635px">
+                    <script type="text/javascript">
+                        function dayComment(url, chartId) {
+                                $.ajax({//Ajax请求你要展现的数据
+                                    url : url,
+                                    type : 'post',
+                                    cache : false,
+                                    dataType : 'json',
+                                    async:false,	//改为同步
+                                    data : {  },	//查看方式
+                                    success : function(data) {
+                                        manyLineChart(chartId, data.legendData, data.datas);
+                                    },
+                                    error : function() {
+                                        alert('服务器异常！')
+                                    }
+                                });
+                            }
+                            function manyLineChart(chartId, legendData, datas){
+                                var seriesjson = [
+                                {longitude:104.088788,latitude:30.622603,customInfo:"微信",customName:"田小姐",createType:1},
+                                {longitude:109.537356,latitude:18.299484,customInfo:"贴吧",customName:"张小姐",createType:3},
+                                {longitude:102.735913,latitude:24.984286,customInfo:"贴吧",customName:"Peter",createType:3},
+                                {longitude:114.373061,latitude:30.515092,customInfo:"微博",customName:"熊先生",createType:2},
+                                {longitude:123.550983,latitude:41.779613,customInfo:"微信",customName:"周先生",createType:1}
+                            ];
+                            var option = null;
+                            var geoCoordMap = {
+                                '黑龙江': [127.9688, 45.368],
+                                '内蒙古': [110.3467, 41.4899],
+                                "吉林": [125.8154, 44.2584],
+                                '北京': [116.4551, 40.2539],
+                                "辽宁": [123.1238, 42.1216],
+                                "河北": [114.4995, 38.1006],
+                                "天津": [117.4219, 39.4189],
+                                "山西": [112.3352, 37.9413],
+                                "陕西": [109.1162, 34.2004],
+                                "甘肃": [103.5901, 36.3043],
+                                "宁夏": [106.3586, 38.1775],
+                                "青海": [101.4038, 36.8207],
+                                "新疆": [87.9236, 43.5883],
+                                "西藏": [91.11, 29.97],
+                                "四川": [103.9526, 30.7617],
+                                "重庆": [108.384366, 30.439702],
+                                "山东": [117.1582, 36.8701],
+                                "河南": [113.4668, 34.6234],
+                                "江苏": [118.8062, 31.9208],
+                                "安徽": [117.29, 32.0581],
+                                "湖北": [114.3896, 30.6628],
+                                "浙江": [119.5313, 29.8773],
+                                "福建": [119.4543, 25.9222],
+                                "江西": [116.0046, 28.6633],
+                                "湖南": [113.0823, 28.2568],
+                                "贵州": [106.6992, 26.7682],
+                                "云南": [102.9199, 25.4663],
+                                "广东": [113.12244, 23.009505],
+                                "广西": [108.479, 23.1152],
+                                "海南": [110.3893, 19.8516],
+                                '上海': [119.1803, 31.2891],
+                                '台湾': [121.4648, 25.5630]
+                            };
+                            var chinaDatas = [];
+                            var convertData = function(data, type) {
+                                /*type:1 地图参数；type:2数据参数*/
+                                var res = [];
+                                for (var i = 0; i < data.length; i++) {
+                                    var geoCoord = geoCoordMap[data[i].name];
+                                    if (geoCoord) {
+                                        if (type == 2) {
+                                            res.push({
+                                                name: data[i].name,
+                                                value: geoCoord.concat(data[i].value),
+                                                username: data[i].username,
+                                                telphone: data[i].telphone,
+                                                address: data[i].address
+                                            });
+                                        } else {
+                                            res.push({
+                                                name: data[i].name,
+                                                value: geoCoord.concat(data[i].value)
+                                            });
+                                        }
+                                    }
+                                }
+                                //console.log(res);
+                                return res;
+                            };
+                                var myChart = echarts.init(document.getElementById( chartId ));
+                                var option = {
+                                        map: 'china',
+                                        roam: false,//是否允许缩放
+                                        top: 80,
+                                        zoom: 1.1, //默认显示级别
+                                        scaleLimit: {
+                                            min: 0,
+                                            max: 3
+                                        }, //缩放级别
+                                        label: {
+                                            normal: {
+                                                show: true,
+                                                textStyle: {
+                                                    color: '#fff'
+                                                }
+                                            },
+                                            emphasis: {
+                                                textStyle: {
+                                                    color: '#fff'
+                                                }
+                                            }
+                                        },
+                                        geo: {
+                                            map: 'china',
+                                            label: {
+                                                show: true,
+                                                color: '#ffffff',
+                                                emphasis: {
+                                                    color: 'white',
+                                                    show: false
+                                                }
+                                            },
+                                            zoom: 1.2,
+                                            itemStyle: {
+                                                normal: {
+                                                    borderColor: 'rgba(26,82,231, 1)',
+                                                    borderWidth: 1,
+                                                    areaColor: {
+                                                        type: 'radial',
+                                                        x: 0.5,
+                                                        y: 0.5,
+                                                        r: 0.8,
+                                                        colorStops: [{
+                                                            offset: 0,
+                                                            color: 'rgba(14, 101, 247, .1)' // 0% 处的颜色
+                                                        }, {
+                                                            offset: 1,
+                                                            color: 'rgba(125, 183, 252, .1)' // 100% 处的颜色
+                                                        }],
+                                                        globalCoord: false // 缺省为 false
+                                                    },
+                                                    shadowColor: 'rgba(255, 255, 255, 0)',
+                                                    shadowOffsetX: -2,
+                                                    shadowOffsetY: 2,
+                                                    shadowBlur: 10
+                                                },
+                                                emphasis: {
+                                                    areaColor: 'rgba(249,157,51, .)',
+                                                    borderWidth: 0
+                                                }
+                                            },
+                                            //是否显示南海诸岛
+                                            /*regions: [{
+                                                name: "南海诸岛",
+                                                value: 0,
+                                                itemStyle: {
+                                                    normal: {
+                                                        opacity: 0,
+                                                        label: {
+                                                            show: false
+                                                        }
+                                                    }
+                                                }
+                                            }],*/
+                                            tooltip: {
+                                                show: false
+                                            }
+                                        },
+                                        series: [
+                                            //报备
+                                            {
+                                                type: 'effectScatter',
+                                                coordinateSystem: 'geo',
+                                                z: 1,
+                                                data: [],
+                                                symbolSize: 14,
+                                                label: {
+                                                    normal: {
+                                                        show: true,
+                                                        formatter: function(params) {
+                                                            return '{fline|用户：'+params.data.username+'  '+'}\t{fline|数据来源: '+params.data.address+'}';
+                                                        },
+                                                        position: 'top',
+                                                        backgroundColor: 'rgba(0 250 154,.8)',
+                                                        padding: [0, 0],
+                                                        borderRadius: 3,
+                                                        lineHeight: 32,
+                                                        color: '#f7fafb',
+                                                        rich:{
+                                                            fline:{
+                                                                padding: [0, 10, 10, 10],
+                                                                color:'#ffffff'
+                                                            },
+                                                            tline:{
+                                                                padding: [10, 10, 0, 10],
+                                                                color:'#ffffff'
+                                                            }
+                                                        }
+                                                    },
+                                                    emphasis: {
+                                                        show: true
+                                                    }
+                                                },
+                                                itemStyle: {
+                                                    color: '#00FA9A',
+                                                }
+                                            },
+                                            //建档
+                                            {
+                                                type: 'effectScatter',
+                                                coordinateSystem: 'geo',
+                                                z: 1,
+                                                data: [],
+                                                symbolSize: 14,
+                                                label: {
+                                                    normal: {
+                                                        show: true,
+                                                        formatter: function(params) {
+                                                            return '{fline|用户：'+params.data.username+'  '+'}\t{fline|数据来源: '+params.data.address+'}';
+                                                        },
+                                                        position: 'top',
+                                                        backgroundColor: 'rgba(233,63,66,.9)',
+                                                        padding: [0, 0],
+                                                        borderRadius: 3,
+                                                        lineHeight: 32,
+                                                        color: '#ffffff',
+                                                        rich:{
+                                                            fline:{
+                                                                padding: [0, 10, 10, 10],
+                                                                color:'#ffffff'
+                                                            },
+                                                            tline:{
+                                                                padding: [10, 10, 0, 10],
+                                                                color:'#ffffff'
+                                                            }
+                                                        }
+                                                    },
+                                                    emphasis: {
+                                                        show: true
+                                                    }
+                                                },
+                                                itemStyle: {
+                                                    color: '#e93f42',
+                                                }
+                                            },
+                                            //来访
+                                            {
+                                                type: 'effectScatter',
+                                                coordinateSystem: 'geo',
+                                                z: 1,
+                                                data: [],
+                                                symbolSize: 14,
+                                                label: {
+                                                    normal: {
+                                                        show: true,
+                                                        formatter: function(params) {
+                                                            return '{fline|用户：'+params.data.username+'  '+'}\t{fline|数据来源:'+params.data.address+'}';
+                                                        },
+                                                        position: 'top',
+                                                        backgroundColor: 'rgba(8,186,236,.9)',
+                                                        padding: [0, 0],
+                                                        borderRadius: 3,
+                                                        lineHeight: 32,
+                                                        color: '#ffffff',
+                                                        rich:{
+                                                            fline:{
+                                                                padding: [0, 10, 10, 10],
+                                                                color:'#ffffff'
+                                                            },
+                                                            tline:{
+                                                                padding: [10, 10, 0, 10],
+                                                                color:'#ffffff'
+                                                            }
+                                                        }
+                                                    },
+                                                    emphasis: {
+                                                        show: true
+                                                    }
+                                                },
+                                                itemStyle: {
+                                                    color: '#08baec',
+                                                }
+                                            },
+                                            //地图
+                                            {
+                                                type: 'map',
+                                                mapType: 'china',
+                                                geoIndex: 0,
+                                                z: 0,
+                                                data: convertData(chinaDatas, 1)
+                                            }
+                                        ]
+                                    };
+
+                                // 使用刚指定的配置项和数据显示图表。
+                                if (option && typeof option === "object") {
+                                    myChart.setOption(option);
+                                }
+                                var runidx = 0;
+                                var timer = setInterval(()=>{
+                                    if(runidx>=seriesjson.length){
+                                        runidx = 0;
+                                    }
+                                    console.log(runidx);
+                                    option.series[seriesjson[runidx].createType-1].data = [{
+                                        name:'',
+                                        username: seriesjson[runidx].customName,
+                                        address: seriesjson[runidx].customInfo,
+                                        value: [seriesjson[runidx].longitude, seriesjson[runidx].latitude, 300]
+                                    }];
+                                    myChart.setOption(option);
+                                    runidx++;
+                                },3000);
+                            };
+
+                            dayComment('/bigdata/houtzh/', 'echart-cn');	//执行
+                    </script>
+                  </div>
+              </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-md-3a">
+              <div class="panel" style="margin-top: 10px;margin-bottom: 10px;background-color:rgba(5,32,53,0.8);border-color:rgba(25,25,112,1)">
+                <div style="padding: 10px;width: 50%;margin:0 auto;text-align: center;">
+                  <span style="color: #ffffff;font-size: 15px;text-align: center;">
+                      敏感信息
+                  </span>
+                  <div class="hr-line-div" style="width: 50%;margin:0 auto"></div>
+                </div>
+                <div class="zzsc">
+                  <ul id="downpaly2" class="downpaly">
+                    {% for news_mg in news_mg %}
+                      <li style="color: #ffffff">
+                        {{ news_mg.content|striptags|truncate }}
+                        <div style="margin: -2px"></div>
+                        <br />
+                        <span style="color: #888888">
+                           {{ news_mg.created_at }}&nbsp&nbsp{{ news_mg.source }}
+                        </span>
+                        <div class="hr-line-div"></div>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+              <div class="panel" style="margin-top: 10px;margin-bottom: 10px;background-color:rgba(5,32,53,0.8);border-color:rgba(25,25,112,1)">
+                  <div style="padding: 10px;width: 95%;margin:0 auto;text-align: center;position: absolute; z-index: 2;">
+                  <span style="color: #ffffff;font-size: 15px;text-align: center;">
+                      热门账户
+                  </span>
+                  <div class="hr-line-div" style="width: 30%;margin:0 auto"></div>
+                </div>
+                <div id="echart-bar-hot" style="width: 100%;height: 330px">
+                    <script type="text/javascript">
+                        function dayComment(url, chartId) {
+                                $.ajax({//Ajax请求你要展现的数据
+                                    url : url,
+                                    type : 'post',
+                                    cache : false,
+                                    dataType : 'json',
+                                    async:false,	//改为同步
+                                    data : {  },	//查看方式
+                                    success : function(data) {
+                                        manyLineChart(chartId, data.legendData, data.datas);
+                                    },
+                                    error : function() {
+                                        alert('服务器异常！')
+                                    }
+                                });
+                            }
+                            function manyLineChart(chartId, legendData, datas){
+                                var myChart = echarts.init(document.getElementById( chartId ));
+                                var option = {
+                                        tooltip : {
+                                        trigger: 'axis',
+                                        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                                            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                                        }
+                                        },
+                                        xAxis: {
+                                            type: 'category',
+                                            data: legendData,
+                                            axisLine: {
+                                                show: false
+                                            },
+                                            axisTick: {
+                                                show: false
+                                            },
+                                            axisLabel: {
+                                                textStyle: {
+                                                    color: '#fff'
+                                                },
+                                                formatter:function(value){
+                                                var str = "";
+                                                var num = 3; //每行显示字数
+                                                var valLength = value.length; //该项x轴字数
+                                                var rowNum = Math.ceil(valLength / num); // 行数
+
+                                                if(rowNum > 1) {
+                                                    for(var i = 0; i < rowNum; i++) {
+                                                        var temp = "";
+                                                        var start = i * num;
+                                                        var end = start + num;
+
+                                                        temp = value.substring(start, end) + "\n";
+                                                        str += temp;
+                                                    }
+                                                    return str;
+                                                } else {
+                                                    return value;
+                                                }
+                                            }
+                                            } ,
+                                        },
+                                        yAxis: {
+                                            show:false
+                                        },
+                                        series: [{
+                                            name:'数据量',
+                                            barWidth:30,
+                                            itemStyle: {
+
+                                                        normal: {
+                                                            label: {
+                                                            formatter: "{c}"+"篇",
+                                                              show: true,
+                                                              position: "top",
+                                                              textStyle: {
+                                                              fontWeight: "bolder",
+                                                              fontSize: "12",
+                                                              color: "#fff"
+                                                                }
+                                                            },
+                                                            color: function(params) {
+                                                                var colorList = [
+                                                                  '#FF8700', '#ffc300', '#00e473', '#009DFF' ,	'#8470FF'
+                                                                ];
+                                                                return colorList[params.dataIndex]
+                                                            }
+                                                        }
+                                                    },
+                                            data: datas,
+                                            type: 'bar'
+                                        }]
+                                    };
+
+                                // 使用刚指定的配置项和数据显示图表。
+                                myChart.setOption( option );
+                            };
+
+                            dayComment('/bigdata/houtzh/', 'echart-bar-hot');	//执行
+                    </script>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+    <script>
+        Date.prototype.format = function (fmt) {
+            var o = {
+                "y+": this.getFullYear, //年
+                "M+": this.getMonth() + 1, //月份
+                "d+": this.getDate(), //日
+                "h+": this.getHours(), //小时
+                "m+": this.getMinutes(), //分
+                "s+": this.getSeconds() //秒
+            };
+            if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o)
+                if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
+        }
+        setInterval("document.getElementById('dateTime').innerHTML = (new Date()).format('yyyy年MM月dd日 hh:mm:ss');", 1000);
+    </script>
+    <script src="{{ url_for('static', filename = 'js/zzsc.js') }}"></script>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+    <script src="../../assets/js/vendor/holder.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+	<script src='http://cdn.files.51wyq.cn/web/js/jquery-1.10.2.min.js?v=201909211230'></script>
+    <script src="http://cdn.files.51wyq.cn/web/css/indexV4/global/vendor/jquery-countdown/jquery.countdown.min.js?v=201909211230" ></script>
+    <title>简理舆情检测平台</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" type="text/css">
+    <script src="{{ url_for('static', filename = 'js/echarts.js') }}"></script>
+	</head>
+	<body>
+	<nav class="navbar navbar-inverse navbar-fixed-top" style="background-color: #000000;height: 60px;">
+      <div class="container-fluid">
+        <div class="navbar-header">
+        	<a href="{{ url_for('home.index') }}">
+				<img src="{{ url_for('static', filename='img/biaoyu-2.png') }}" style="width:140px;margin-top: 20px;margin-left: 5px;"  >
+			</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse" >
+          <ul class="nav navbar-nav navbar-right">
+          	<li><a href="#">
+                <span style="font-size: 15px;color: #FFFFFF;">
+                    {{ username }}
+                </span>
+            </a></li>
+            <li><a href="{{ url_for('home.logout') }}">
+                <span style="font-size: 15px;color: #FFFFFF;">
+                    注销
+                </span>
+            </a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li><a href="{{ url_for('home.user') }}">信息列表</a></li>
+            <li class="active"><a href="">图表分析 <span class="sr-only">(current)</span></a></li>
+            <li><a href="{{ url_for('home.bigdata') }}" target="_blank">数据大屏</a></li>
+            <li><a href="{{ url_for('home.setting') }}">设置</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <div class="row clearfix">
+          	<div class="col-md-3 col-md-3a">
+          		<div class="panel">
+          			<div class="panel-body" style="padding: 15px;">
+          				<div class="fc_dark_grey">
+          					统计时间
+          					<div style="margin-top: 10px;">
+                                <span id="counttime" style="color: #888888">
+                                    <script type="text/javascript">
+                                        $(document).ready(function() {
+                                    $.ajax({
+                                        url : "/chart/line/",
+                                        dataType : "json",//数据格式
+                                        type : "post",//请求方式
+                                        async : false,//是否异步请求
+                                        success : function(data) {   //如果请求成功，返回数据。
+                                            $("#counttime").html(data.fromTime + ' 00:00:00~' + data.toTime + ' 00:00:00'); //在html页面id=test的标签里显示html内容
+                                        },
+                                    })
+                                    })
+                                    </script>
+                                </span>
+                            </div>
+          				</div>
+          			</div>
+          		</div>
+          		<div class="panel">
+          			<div class="panel-body" style="padding: 15px;">
+          				<div class="row clearfix">
+          					<div class="col-md-6">
+          						<div class="dashboard-white" style="margin-top: 20px;">
+          							<p class="fz14 fc_dark_grey">全部信息</p>
+          							<h1 class="fz24 mt5">
+          								<span></span>
+          								<span id="countall">
+                                            <script type="text/javascript">
+                                                $(document).ready(function() {
+                                            $.ajax({
+                                                url : "/chart/countall/",
+                                                dataType : "json",//数据格式
+                                                type : "post",//请求方式
+                                                async : false,//是否异步请求
+                                                success : function(data) {   //如果请求成功，返回数据。
+                                                    $("#countall").html(data.num); //在html页面id=test的标签里显示html内容
+                                                },
+                                            })
+                                            })
+                                            </script>
+                                        </span>
+                                        <span class="fz16">条</span>
+          							</h1>
+          						</div>
+          					</div>
+          					<div class="col-md-6">
+                                <div id="echart-pie-countall" style="width: 156px;height: 120px">
+                                    <script type="text/javascript">
+                                        function dayComment(url, chartId) {
+                                                $.ajax({//Ajax请求你要展现的数据
+                                                    url : url,
+                                                    type : 'post',
+                                                    cache : false,
+                                                    dataType : 'json',
+                                                    async:false,	//改为同步
+                                                    data : {  },	//查看方式
+                                                    success : function(data) {
+                                                        manyLineChart(data.num, chartId);
+                                                    },
+                                                    error : function() {
+                                                        alert('服务器异常！')
+                                                    }
+                                                });
+                                            }
+                                            function manyLineChart(countall, chartId){
+
+                                                var myChart = echarts.init(document.getElementById( chartId ));
+                                                var option = {
+                                                        tooltip: {
+                                                            trigger: 'item',
+                                                            formatter: "{b}: {c} ({d}%)"
+                                                        },
+                                                        title:{
+
+                                                            text:"100%",
+                                                            textStyle: {
+                                                                fontSize:17,
+                                                                fontWeight:'300',
+                                                                color: ['#0c0c0c']
+                                                            },
+                                                            x: 'center',
+                                                            y: 'center',
+                                                        },
+                                                        series: [
+                                                            {
+                                                                type:'pie',
+                                                                radius: ['65%', '85%'],
+                                                                avoidLabelOverlap: false,
+                                                                color:['#3CB371'],
+                                                                label: {
+                                                                    normal: {
+                                                                        show: false,
+                                                                        position: 'center'
+                                                                    },
+
+                                                                },
+                                                                labelLine: {
+                                                                    normal: {
+                                                                        show: false
+                                                                    }
+                                                                },
+                                                                data:[
+                                                                    {value:countall, name:'全部信息'}
+                                                                ]
+                                                            }
+                                                        ]
+                                                    };
+
+                                                // 使用刚指定的配置项和数据显示图表。
+                                                myChart.setOption( option );
+                                            };
+
+                                            dayComment( '/chart/countall/', 'echart-pie-countall');	//执行
+                                    </script>
+                                </div>
+                            </div>
+          				</div>
+          			</div>
+          		</div>
+          		<div class="panel">
+          			<div class="panel-body" style="padding: 15px;">
+          				<div class="row clearfix">
+          					<div class="col-md-6">
+          						<div class="dashboard-white" style="margin-top: 20px;">
+          							<p class="fz14 fc_dark_grey">敏感信息</p>
+          							<h1 class="fz24 mt5">
+          								<span id="countmg">
+                                            <script type="text/javascript">
+                                                $(document).ready(function() {
+                                            $.ajax({
+                                                url : "/chart/countmg/",
+                                                dataType : "json",//数据格式
+                                                type : "post",//请求方式
+                                                async : false,//是否异步请求
+                                                success : function(data) {   //如果请求成功，返回数据。
+                                                    $("#countmg").html(data.nummg); //在html页面id=test的标签里显示html内容
+                                                },
+                                            })
+                                            })
+                                            </script>
+                                        </span>
+                                        <span class="fz16">条</span>
+          							</h1>
+          						</div>
+          					</div>
+          					<div class="col-md-6">
+                                <div id="echart-pie-countmg" style="width: 156px;height: 120px">
+                                    <script type="text/javascript">
+                                        function dayComment(url, chartId) {
+                                                $.ajax({//Ajax请求你要展现的数据
+                                                    url : url,
+                                                    type : 'post',
+                                                    cache : false,
+                                                    dataType : 'json',
+                                                    async:false,	//改为同步
+                                                    data : {  },	//查看方式
+                                                    success : function(data) {
+                                                        manyLineChart(data.num, data.nummg, data.per, chartId);
+                                                    },
+                                                    error : function() {
+                                                        alert('服务器异常！')
+                                                    }
+                                                });
+                                            }
+                                            function manyLineChart(countall, countmg, per, chartId){
+
+                                                var myChart = echarts.init(document.getElementById( chartId ));
+                                                var option = {
+                                                        tooltip: {
+                                                            trigger: 'item',
+                                                            formatter: "{b}: {c} ({d}%)"
+                                                        },
+                                                        title:{
+
+                                                            text: per + "%",
+                                                            textStyle: {
+                                                                fontSize:17,
+                                                                fontWeight:'300',
+                                                                color: ['#0c0c0c']
+                                                            },
+                                                            x: 'center',
+                                                            y: 'center',
+                                                        },
+                                                        series: [
+                                                            {
+                                                                type:'pie',
+                                                                radius: ['65%', '85%'],
+                                                                avoidLabelOverlap: false,
+                                                                color:['#D3D3D3', '#FF0000'],
+                                                                label: {
+                                                                    normal: {
+                                                                        show: false,
+                                                                        position: 'center'
+                                                                    },
+
+                                                                },
+                                                                labelLine: {
+                                                                    normal: {
+                                                                        show: false
+                                                                    }
+                                                                },
+                                                                data:[
+                                                                    {value:countall, name:'全部信息'},
+                                                                    {value:countmg, name:'敏感信息'}
+                                                                ]
+                                                            }
+                                                        ]
+                                                    };
+
+                                                // 使用刚指定的配置项和数据显示图表。
+                                                myChart.setOption( option );
+                                            };
+
+                                            dayComment( '/chart/countmg/', 'echart-pie-countmg');	//执行
+                                    </script>
+                                </div>
+                            </div>
+          				</div>
+          			</div>
+          		</div>
+          	</div>
+          	<div class="col-md-9 col-md-9a">
+          		<div class="row clearfix" style="margin-right: -16px;">
+          			<div class="col-md-12">
+          				<div class="panel">
+          					<div class="panel-heading-padd">
+          						<div class="panel-heading">
+          							<h3 class="panel-title">信息走势图</h3>
+          							<div class="tools mr15">          								
+          								
+          							</div>
+          						</div>
+          					</div>
+          					<div class="panel-collapse collapse in">
+          						<div class="panel-body">
+                                    <div id="echart-line" style="height: 343px;width: 1100px;">
+                                        <script type="text/javascript">
+                                            function dayComment(url,chartId, title) {
+                                                $.ajax({//Ajax请求你要展现的数据
+                                                    url : url,
+                                                    type : 'post',
+                                                    cache : false,
+                                                    dataType : 'json',
+                                                    async:false,	//改为同步
+                                                    data : {  },	//查看方式
+                                                    success : function(data) {
+                                                        manyLineChart(chartId, title, data.legendData, data.xAxisData, data.yAxisData, data.fromTime, data.toTime);
+                                                    },
+                                                    error : function() {
+                                                        alert('服务器异常！')
+                                                    }
+                                                });
+                                            }
+
+                                            /**
+                                             * @todo 多条线折线图可拖拽
+                                             * @param chartId		插件的div的ID
+                                             * @param textname		标题
+                                             * @param xAxisName	X轴的名字
+                                             * @param legendData	图示的数据
+                                             * @param xAxisData	X轴的数据
+                                             * @param  yAxisData    Y轴的数据[数组]
+                                             * @param fromTime   默认开始节点
+                                             * @param toTime	 默认结束节点
+                                             * */
+                                            function manyLineChart( chartId, textname, legendData, xAxisData, yAxisData, fromTime, toTime ){
+                                                var lineCount = legendData.length;	//折线的条数
+                                                var seriesArray = [];
+                                                //循环得到Y轴的数据
+                                                for(var x=0; x<lineCount; x++){
+                                                    seriesArray[x] = {name:legendData[x],type:'line',data:yAxisData[x][0]};
+                                                }
+
+                                                var myChart = echarts.init(document.getElementById( chartId ));
+                                                var option = {
+                                                        //color:['red', 'black', 'green', 'blue', 'orange'],
+                                                        color:["#ff7f50","#87cefa","#da70d6","#32cd32","#6495ed","#ff69b4","#ba55d3","#cd5c5c","#ffa500","#40e0d0",
+                                                               "#1e90ff","#ff6347","#7b68ee", "#00fa9a","#ffd700","#6699FF","#ff6666","#3cb371","#b8860b","#30e0e0"],	//[数组]颜色，按照设置的循环
+                                                        title: {
+                                                            text: textname,
+                                                            left: 'left'
+                                                        },
+                                                        grid:{
+                                                            x:30,
+                                                            x2:5,
+                                                        },
+                                                        tooltip: {
+                                                            trigger: 'axis',
+                                                        },
+                                                        toolbox: {
+                                                            show : true,
+                                                            feature : {
+                                                                magicType : {show: true, type: ['line', 'bar']},
+                                                                restore: {},
+                                                                saveAsImage: {}
+                                                            }
+                                                        },
+                                                        legend: {
+                                                            data: legendData
+                                                        },
+                                                        calculable : true,
+                                                        dataZoom : {
+                                                            show : true,
+                                                            realtime : true,
+                                                            startValue: fromTime, 	//拖拽条开始时间
+                                                            endValue: toTime,			//拖拽条结束时间
+                                                        },
+                                                        xAxis: {
+                                                            type: 'category',
+                                                            splitLine: {show: false},
+                                                            data: xAxisData,
+                                                        },
+                                                        yAxis: {
+                                                            type: 'value',
+                                                        },
+                                                        series: seriesArray
+                                                    };
+
+                                                // 使用刚指定的配置项和数据显示图表。
+                                                myChart.setOption( option );
+                                            };
+
+                                            dayComment( '/chart/line/', 'echart-line', '{{ taskname }}');	//执行
+                                        </script>
+                                    </div>
+          						</div>
+          					</div>
+          				</div>
+          			</div>
+          		</div>
+          	</div>
+          </div>
+          <div class="row clearfix">
+          		<div class="col-md-12">
+          			<div class="panel">
+          				<div class="panel-heading-padd">
+          					<div class="panel-heading">
+          						<h3 class="panel-title">“周-时”信息发布规律图</h3>
+          						<span style="font-size: 11px; margin-left: 12px;">
+          							time
+          						</span>
+          						<div class="tools mr15">
+          							
+          						</div>
+          					</div>
+          				</div>
+          				<div class="panel-collapse collapse in">
+          					<div class="panel-body">
+                                <div class="row clearfix">
+                                    <div class="col-md-12">
+                                        <div id="echart-heatmap" style="height: 400px;width: 100%;margin-left: -30px">
+                                        <script type="text/javascript">
+                                        function dayComment(url, chartId) {
+                                                $.ajax({//Ajax请求你要展现的数据
+                                                    url : url,
+                                                    type : 'post',
+                                                    cache : false,
+                                                    dataType : 'json',
+                                                    async:false,	//改为同步
+                                                    data : {  },	//查看方式
+                                                    success : function(data) {
+                                                        manyLineChart(data.hours, data.day, data.datas, data.max, chartId);
+                                                    },
+                                                    error : function() {
+                                                        alert('服务器异常！')
+                                                    }
+                                                });
+                                            }
+                                            function manyLineChart(hours, days, data, max, chartId){
+
+                                                var myChart = echarts.init(document.getElementById( chartId ));
+                                                var hours = hours
+                                                var days = days
+                                                var data = data
+                                                data = data.map(function (item) {
+                                                    return [item[1], item[0], item[2] || '-'];
+                                                });
+                                                var option = {
+                                                        tooltip: {
+                                                            position: 'top'
+                                                        },
+                                                        animation: false,
+                                                        grid: {
+                                                            height: '75%',
+                                                            y: 20
+                                                        },
+                                                        xAxis: {
+                                                            type: 'category',
+                                                            data: hours,
+                                                            splitArea: {
+                                                                show: true
+                                                            }
+                                                        },
+                                                        yAxis: {
+                                                            type: 'category',
+                                                            data: days,
+                                                            splitArea: {
+                                                                show: true
+                                                            }
+                                                        },
+                                                        toolbox: {
+                                                            right: 50,
+                                                            feature: {
+                                                                saveAsImage: {}
+                                                            }
+                                                        },
+                                                        visualMap: {
+                                                            min: 0,
+                                                            max: max,
+                                                            itemHeight:925,
+                                                            calculable: true,
+                                                            align: 'top',
+                                                            text: ['高', '低'],
+                                                            orient: 'horizontal',
+                                                            left: 'center',
+                                                            bottom: '2%',
+                                                            inRange: {
+                                                                color: ['#F5F5F5','#FF8C00']
+                                                            }
+                                                        },
+                                                        series: [{
+                                                            name: '信息量',
+                                                            type: 'heatmap',
+                                                            data: data,
+                                                            label: {
+                                                                normal: {
+                                                                    show: true
+                                                                }
+                                                            },
+                                                            itemStyle: {
+                                                                emphasis: {
+                                                                    shadowBlur: 10,
+                                                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                                                }
+                                                            }
+                                                        }]
+                                                    };
+
+                                                // 使用刚指定的配置项和数据显示图表。
+                                                myChart.setOption( option );
+                                            };
+
+                                            dayComment( '/chart/heatmap/', 'echart-heatmap');	//执行
+                                        </script>
+                                    </div>
+                                    </div>
+{#                                    <div class="col-md-3 down-keyword-new-search-reviewHeat-tabel" style="margin-left: -50px">#}
+{#                                        <div class="table-border table-in-noborder">#}
+{#                                            <div class="infoSolt-tab" style="height: 290px; width: 100%; overflow: auto;">#}
+{#                                                <div class="infoSolt-tit" >信息量爆发时间段TOP6</div>#}
+{#                                                <table border="0" cellspacing="0" cellpadding="0" class="table" width="100%">#}
+{#                                                    <thead>#}
+{#                                                        <tr>#}
+{#                                                            <th width="60%">周-时</th>#}
+{#                                                            <th width="60%">信息量</th>#}
+{#                                                        </tr>#}
+{#                                                    </thead>#}
+{#                                                    <tbody>#}
+{##}
+{#                                                    </tbody>#}
+{#                                                </table>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    </div>#}
+                                </div>
+
+          					</div>
+          				</div>
+          			</div>
+          		</div>
+          </div>
+          <div class="row clearfix">
+          	<div class="col-md-12">
+          		<div class="panel">
+          			<div class="panel-heading-padd">
+          				<div class="panel-heading">
+          					<h3 class="panel-title">信息属性走势图</h3>
+          					<div class="tools mr15">
+          						
+          					</div>
+          				</div>
+          			</div>
+          			<div class="panel-collapse collapse in">
+          				<div class="panel-body">
+          					<div id="echart-line-type" style="height: 343px;width:100%;">
+                                        <script type="text/javascript">
+                                            function dayComment(url,chartId, title) {
+                                                $.ajax({//Ajax请求你要展现的数据
+                                                    url : url,
+                                                    type : 'post',
+                                                    cache : false,
+                                                    dataType : 'json',
+                                                    async:false,	//改为同步
+                                                    data : {  },	//查看方式
+                                                    success : function(data) {
+                                                        manyLineChart(chartId, title, data.legendData, data.xAxisData, data.yAxisData);
+                                                    },
+                                                    error : function() {
+                                                        alert('服务器异常！')
+                                                    }
+                                                });
+                                            }
+                                            function manyLineChart( chartId, textname, legendData, xAxisData, yAxisData){
+                                                var myChart = echarts.init(document.getElementById( chartId ));
+                                                var option = {
+                                                        color: ['rgb(255,140,0, 0.5)','rgb(50,205,50, 0.5)'],
+                                                        title: {
+                                                            text: textname
+                                                        },
+                                                        tooltip : {
+                                                            trigger: 'axis',
+                                                            axisPointer: {
+                                                                type: 'cross',
+                                                                label: {
+                                                                    backgroundColor: '#6a7985'
+                                                                }
+                                                            }
+                                                        },
+                                                        legend: {
+                                                            data: legendData
+                                                        },
+                                                        toolbox: {
+                                                            feature: {
+                                                                restore: {},
+                                                                saveAsImage: {}
+                                                            }
+                                                        },
+                                                        grid: {
+                                                            left: '3%',
+                                                            right: '4%',
+                                                            bottom: '3%',
+                                                            containLabel: true
+                                                        },
+                                                        xAxis : [
+                                                            {
+                                                                type : 'category',
+                                                                boundaryGap : false,
+                                                                data : xAxisData
+                                                            }
+                                                        ],
+                                                        yAxis : [
+                                                            {
+                                                                type : 'value'
+                                                            }
+                                                        ],
+                                                        series: [
+                                                            {
+                                                                name: legendData[0],
+                                                                type:'line',
+                                                                stack: '总量',
+                                                                data:yAxisData[0][0],
+                                                                areaStyle: {},
+                                                            },
+                                                            {
+                                                                name:legendData[1],
+                                                                type:'line',
+                                                                stack: '总量',
+                                                                data:yAxisData[1][0],
+                                                                areaStyle: {},
+                                                            }
+                                                        ]
+                                                    };
+
+                                                // 使用刚指定的配置项和数据显示图表。
+                                                myChart.setOption( option );
+                                            };
+
+                                            dayComment( '/chart/counttype/', 'echart-line-type', '{{ taskname }}');	//执行
+                                        </script>
+                                    </div>
+          				</div>
+          			</div>
+          		</div>
+          	</div>
+          </div>
+          <div class="row clearfix">
+          	<div class="col-md-6">
+          		<div class="row clearfix" style="margin-left: -15px;margin-right: -20px;">
+          			<div class="col-md-12">
+          				<div class="panel">
+          					<div class="panel-heading-padd">
+          						<div class="panel-heading">
+          							<h3 class="panel-title">来源类型统计图</h3>
+          							<div class="tools mr15">
+          								
+          							</div>
+          						</div>
+          					</div>
+          					<div class="panel-collapse collapse in">
+          						<div class="panel-body">
+          							<div id="echart-bie-in" style="height: 343px;width:100%;">
+                                        <script type="text/javascript">
+                                            function dayComment(url,chartId) {
+                                                $.ajax({//Ajax请求你要展现的数据
+                                                    url : url,
+                                                    type : 'post',
+                                                    cache : false,
+                                                    dataType : 'json',
+                                                    async:false,	//改为同步
+                                                    data : {  },	//查看方式
+                                                    success : function(data) {
+                                                        manyLineChart(chartId, data.legendData, data.datas);
+                                                    },
+                                                    error : function() {
+                                                        alert('服务器异常！')
+                                                    }
+                                                });
+                                            }
+                                            function manyLineChart( chartId, legendData, data){
+                                                var lineCount = legendData.length;
+                                                var datas = [];
+                                                for(var x=0; x<lineCount; x++){
+                                                    datas[x] = {value:data[x], name:legendData[x]};
+                                                }
+                                                var myChart = echarts.init(document.getElementById( chartId ));
+                                                var option = {
+                                                        color:["#F4A460","#FF8C00","#CD853F","#D2691E","#8B4513","#ff69b4","#ba55d3","#cd5c5c","#ffa500","#40e0d0",
+				                                                "#1e90ff","#ff6347","#7b68ee", "#00fa9a","#ffd700","#6699FF","#ff6666","#3cb371","#b8860b","#30e0e0"],
+                                                        tooltip: {
+                                                            trigger: 'item',
+                                                            formatter: "{a} <br/>{b}: {c} ({d}%)"
+                                                        },
+                                                        legend: {
+                                                            orient: 'vertical',
+                                                            x: 'left',
+                                                            data:legendData
+                                                        },
+                                                        toolbox: {
+                                                            feature: {
+                                                                saveAsImage: {}
+                                                            }
+                                                        },
+                                                        series: [
+                                                            {
+                                                                name:'访问来源',
+                                                                type:'pie',
+                                                                radius: ['50%', '70%'],
+                                                                avoidLabelOverlap: true,
+                                                                data:datas
+                                                            }
+                                                        ]
+                                                    };
+
+                                                // 使用刚指定的配置项和数据显示图表。
+                                                myChart.setOption( option );
+                                            };
+
+                                            dayComment( '/chart/bie/in', 'echart-bie-in');	//执行
+                                        </script>
+                                    </div>
+          						</div>
+          					</div>
+          				</div>
+          			</div>
+          		</div>
+          	</div>
+          	<div class="col-md-6">
+          		<div class="row clearfix" style="margin-left: -20px;margin-right: -15px;">
+          			<div class="col-md-12">
+          				<div class="panel">
+          					<div class="panel-heading-padd">
+          						<div class="panel-heading">
+          							<h3 class="panel-title">媒体活跃度Top10占比</h3>
+          							<div class="tools mr15">
+          								
+          							</div>
+          						</div>
+          					</div>
+          					<div class="panel-collapse collapse in">
+          						<div class="panel-body">
+          							<div id="echart-bie-mt" style="height: 343px;width:100%;">
+                                        <script type="text/javascript">
+                                            function dayComment(url,chartId) {
+                                                $.ajax({//Ajax请求你要展现的数据
+                                                    url : url,
+                                                    type : 'post',
+                                                    cache : false,
+                                                    dataType : 'json',
+                                                    async:false,	//改为同步
+                                                    data : {  },	//查看方式
+                                                    success : function(data) {
+                                                        manyLineChart(chartId, data.legendData, data.datas);
+                                                    },
+                                                    error : function() {
+                                                        alert('服务器异常！')
+                                                    }
+                                                });
+                                            }
+                                            function manyLineChart( chartId, legendData, data){
+                                                var lineCount = legendData.length;
+                                                var datas = [];
+                                                for(var x=0; x<lineCount; x++){
+                                                    datas[x] = {value:data[x], name:legendData[x]};
+                                                }
+                                                var myChart = echarts.init(document.getElementById( chartId ));
+                                                var option = {
+                                                        color:["#F4A460","#FF8C00","#CD853F","#D2691E","#8B4513","#ff69b4","#ba55d3","#cd5c5c","#ffa500","#40e0d0",
+				                                                "#1e90ff","#ff6347","#7b68ee", "#00fa9a","#ffd700","#6699FF","#ff6666","#3cb371","#b8860b","#30e0e0"],
+                                                        tooltip : {
+                                                            trigger: 'item',
+                                                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                                                        },
+                                                        legend: {
+                                                            x : 'left',
+                                                            orient: 'vertical',
+                                                            data:legendData
+                                                        },
+                                                        toolbox: {
+                                                                feature: {
+                                                                    saveAsImage: {}
+                                                                }
+                                                            },
+                                                        calculable : true,
+                                                        series : [
+                                                            {
+                                                                name:'访问来源',
+                                                                type:'pie',
+                                                                avoidLabelOverlap: true,
+                                                                radius : ['40%', '80%'],
+                                                                roseType : 'area',
+                                                                data: datas
+                                                            }
+                                                        ]
+                                                    };
+
+                                                // 使用刚指定的配置项和数据显示图表。
+                                                myChart.setOption( option );
+                                            };
+
+                                            dayComment( '/chart/bie/in', 'echart-bie-mt');	//执行
+                                        </script>
+                                    </div>
+          						</div>
+          					</div>
+          				</div>
+          			</div>
+          		</div>
+          	</div>
+          </div>
+{#          <div class="row clearfix">#}
+{#          	<div class="col-md-12">#}
+{#          		<div class="panel">#}
+{#          			<div class="panel-heading-padd">#}
+{#          				<div class="panel-heading">#}
+{#          					<h3 class="panel-title">全网关键词云</h3>#}
+{#          					<div class="tools mr15">#}
+{#          						#}
+{#          					</div>#}
+{#          				</div>#}
+{#          			</div>#}
+{#          			<div class="panel-collapse collapse in">#}
+{#          				<div class="panel-body">#}
+{#          					词云图#}
+{#          				</div>#}
+{#          			</div>#}
+{#          		</div>#}
+{#          	</div>#}
+{#          </div>#}
+          
+        </div>
+      </div>
+    </div>
+    
+    
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+    <script src="../../assets/js/vendor/holder.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+	</body>
+</html>
